@@ -1,17 +1,14 @@
-from bs4 import BeautifulSoup as bs
-import requests
+
 import pandas as pd
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from fake_useragent import UserAgent
 import time
 import random
 import urllib.parse
 import re
+from Keywords  import depression_keywords, emotional_keywords
 
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
@@ -28,76 +25,7 @@ options.add_argument(f"user-agent={random.choice(user_agents)}")
 url = 'https://www.threads.com/search?q='
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
-depression_keywords = [
-    "sad",
-    "depressed",
-    "hopeless",
-    "tired",
-    "exhausted",
-    "stressed",
-    "overwhelmed",
-    "lonely",
-    "anxious",
-    "can't do anything anymore",
-    "I want to disappear",
-    "I feel worthless",
-    "alone",
-    "pain",
-    "suffering",
-    "crying",
-    "tears",
-    "broken",
-    "lost",
-    "empty",
-    "numb",
-    "hurt",
-    "panic"
-]
-emotional_keywords = [
-    "tired",
-    "so tired",
-    "exhausted",
-    "overwhelmed",
-    "stressed",
-    "hopeless",
-    "worthless",
-    "alone",
-    "lonely",
-    "isolated",
-    "can't sleep",
-    "crying",
-    "feel numb",
-    "feel empty",
-    "life is hard",
-    "nothing matters",
-    "can't take it",
-    "want to disappear",
-    "want to die",
-    "broken",
-    "lost",
-    "hurt",
-    "pain",
-    "suffering",
-    "panic",
-    "anxious",
-    "depressed",
-    "done with everything",
-    "feel hopeless",
-    "feel useless",
-    "too much to handle",
-    "so sad",
-    "can't keep going",
-    "burned out",
-    "drained",
-    "overthinking",
-    "i'm not okay",
-    "everything hurts",
-    "wish i could disappear",
-    "can't deal",
-    "life is meaningless",
-    "died",
-    "die"
-]
+
 need = []
 df = pd.DataFrame(columns=["Text"])
 seen = set()
@@ -113,6 +41,7 @@ def search(url):
                 break
             last_height = new_height
         time.sleep(random.uniform(1, 3))
+        print(f"Parsing posts")
         posts = driver.find_elements(By.XPATH, "//span[@dir='auto' and not(ancestor::div[contains(@style,'--maxHeight')])]")
         for i, post in enumerate(posts):
             try:
@@ -137,10 +66,12 @@ def search(url):
         print("WRONG", ex)
 
 for index in range(10):
-    keyword = depression_keywords[index]
+    keyword = random.choice(depression_keywords)
     encoded = urllib.parse.quote(keyword)
+    print(f'Searching for posts with the word "{keyword.upper()}"')
     full_url = f"https://www.threads.com/search?q={encoded}"
     search(full_url)
+    print(f'Finished parsing posts with the word "{keyword.upper()}", moving on to the next one')
 
 driver.close()
 driver.quit()
