@@ -46,9 +46,6 @@ def search(url):
         for i, post in enumerate(posts):
             try:
                 text_of_post = post.text.strip().lower()
-                text_of_post = re.sub(r'@\w+', '', text_of_post)
-                text_of_post = re.sub(r'http\S+', '', text_of_post)
-                text_of_post = text_of_post.replace("\n", " ")
                 for ui_word in ["like", "reply", "share", "follow", "repost"]:
                     text_of_post = text_of_post.replace(ui_word, "")
                 text_of_post = ' '.join(text_of_post.split())
